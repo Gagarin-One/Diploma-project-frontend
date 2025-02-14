@@ -1,11 +1,16 @@
 import type { Action, ThunkAction } from '@reduxjs/toolkit'
-import { configureStore } from '@reduxjs/toolkit'
-import counterReducer from '../features/counter/counterSlice'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
+import counterSlice from '../features/counter/counterSlice'
+import userSlice from '../pages/home/homeSlice';
+
+const rootReducers = combineReducers({
+  counterSlice,
+  userSlice
+})
+
 
 export const store = configureStore({
-  reducer: {
-    counter: counterReducer
-  }
+  reducer: rootReducers
 })
 
 // Infer the type of `store`

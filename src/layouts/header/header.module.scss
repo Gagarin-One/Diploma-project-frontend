@@ -10,8 +10,13 @@
     color: #fcffda;
   }
   .header{
+    display: flex;
+    justify-content: space-between;
     margin:0 auto;
 
+    h3{
+      margin-top:50px;
+    }
     @media (min-width: 1000px) {
       width: 990px;
   }
