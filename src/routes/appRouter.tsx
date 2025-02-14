@@ -1,22 +1,30 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "../pages/Home";
-import About from "../pages/About";
-import Contact from "../pages/Contact";
-import NotFound from "../pages/NotFound";
-import Navbar from "../components/Navbar";
-
+import Home from "../pages/home/home";
+import Farmer from "../pages/farmer/farmer";
+import Registration from "../pages/registration/registration";
+import User from "../pages/user/user";
+import Login from "../pages/login/login";
+import Header from "../layouts/header/headerComponent";
+import Footer from "../layouts/footer/footerComponent";
+import NotFound from "../pages/notFound/notFound";
+import s from "./appContainer.module.scss"
+import UpperHeader from "../layouts/upperHeader/upperHeaderComponent";
 const AppRouter: React.FC = () => {
   return (
     <Router>
+      <UpperHeader/>
       <Header />
-      <Routes>
+      <div className={s.container}>
+      <Routes >
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<Registration />} />
         <Route path="/user/:id" element={<User />} />
         <Route path="/farmer/:id" element={<Farmer />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </div>
+      
       <Footer />
     </Router>
   );

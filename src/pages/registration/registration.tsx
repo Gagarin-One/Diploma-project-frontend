@@ -1,0 +1,8 @@
+const Registration: React.FC = () => {
+
+  return <div>
+
+  </div>;
+};
+
+export default Registration
