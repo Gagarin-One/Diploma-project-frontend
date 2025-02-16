@@ -2,10 +2,12 @@ import type { Action, ThunkAction } from '@reduxjs/toolkit'
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import counterSlice from '../features/counter/counterSlice'
 import userSlice from '../pages/home/homeSlice';
+import authSlice from '../features/authForm/authSlice';
 
 const rootReducers = combineReducers({
   counterSlice,
-  userSlice
+  userSlice,
+  authSlice
 })
 
 

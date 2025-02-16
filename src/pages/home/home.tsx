@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import ProductCard from '../../components/product';
 import { useEffect } from 'react';
 import { fetchAllProducts } from '../home/homeSlice';
+import { checkUser } from '../../features/authForm/authSlice';
 type Product = {
   id: number,
   name: string,
@@ -21,6 +22,7 @@ const products = useAppSelector((state) => state.userSlice.products)
 useEffect(() => {
   // Запрашиваем продукты при монтировании компонента
   dispatch(fetchAllProducts());
+  dispatch(checkUser())
 }, [dispatch]);
 
 
