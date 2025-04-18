@@ -10,12 +10,14 @@ height: 35px;
     margin: 5px 0;  
     width: 150px;
     text-align: center;
+    font-weight: 500;
   }
   a{
     color: #ffffff;
-    margin: 5px 0;  
-    width: 150px;
+    margin: 5px 15px 0 0px;  
+    width: 50px;
     text-align: center;
+    font-weight: 500;
   }
   .header{
     display: flex;
@@ -24,8 +26,8 @@ height: 35px;
 
     margin:0 auto;
 
-    @media (min-width: 1000px) {
-      width: 990px;
+    @media (min-width: 1200px) {
+      width: 1150px;
   }
 }
   
