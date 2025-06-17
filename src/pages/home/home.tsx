@@ -85,8 +85,8 @@ const User: React.FC = () => {
           className={styles.sortSelect}
         >
           <option value="">Все категории</option>
-          <option value={2}>Овощи</option>
-          <option value={1}>Фрукты</option>
+          <option value={1}>Овощи</option>
+          <option value={2}>Фрукты</option>
           <option value={3}>Молочная продукция</option>
           <option value={4}>Мясо</option>
           <option value={5}>Выпечка и хлеб</option>

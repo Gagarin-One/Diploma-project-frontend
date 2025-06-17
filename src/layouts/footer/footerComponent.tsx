@@ -1,16 +1,23 @@
-import { Link } from 'react-router-dom';
+import { Link, redirect, useNavigate } from 'react-router-dom';
 import s from './footer.module.scss';
+import { useAppDispatch } from '../../hooks/hooks';
+import { logout } from '../../features/authForm/authSlice';
 const Footer: React.FC = () => {
-
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    dispatch(logout()); // вызываем действие логаута
+    navigate('/login'); // затем перенаправляем на экран логина
+  };
   return <div className={s.footer}>
   <div className={s.container}>
     <div className={s.linksContainer}>
-        <Link to="/vegetables">О нас</Link>
-        <Link to="/fruits">Условия доставки</Link>
-        <Link to="/milkProducts">Личный кабинет</Link>
         <Link to="/milkProducts">Моя корзина</Link>
         <Link to="/meat">Мои заказы</Link>
-        <Link to="/meat">Фермерам</Link>
+        <Link to="/farmer/orders">Для фермеров</Link>
+        <button onClick={handleLogout} className={s.logoutBtn}>
+            Выйти из аккаунта
+          </button>
       </div>
       <div className={s.iconContainer}>
           <img src="data:image/svg+xml,%3csvg%20width='33'%20height='21'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20fill='%23969696'%20d='M11.725%202.188h8.653v15.723h-8.653z'/%3e%3cpath%20fill-rule='evenodd'%20clip-rule='evenodd'%20d='M12.273%2010.051a10.023%2010.023%200%200%201%203.777-7.863A9.81%209.81%200%200%200%202.675%203.266c-3.499%203.83-3.499%209.737%200%2013.567a9.81%209.81%200%200%200%2013.375%201.078%2010.023%2010.023%200%200%201-3.777-7.86z'%20fill='gray'/%3e%3cpath%20fill-rule='evenodd'%20clip-rule='evenodd'%20d='M32.051%2010.05c0%203.83-2.162%207.321-5.567%208.994a9.8%209.8%200%200%201-10.433-1.133%2010.04%2010.04%200%200%200%203.778-7.862%2010.04%2010.04%200%200%200-3.778-7.861%209.8%209.8%200%200%201%2010.433-1.133c3.405%201.673%205.567%205.165%205.567%208.993v.003z'%20fill='%23C2C2C2'/%3e%3c/svg%3e" alt="Search Icon" className={s.searchIcon} />

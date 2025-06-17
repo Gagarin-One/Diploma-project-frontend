@@ -22,14 +22,28 @@ const RegistrationForm = () => {
   } = useForm<registrationFormData>({
     resolver: yupResolver(registrationFormSchema),
   });
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/')
-    }
-  }, [isAuthenticated])
+
+ 
 
   const onSubmit = async (dto: registrationFormData) => {
-  dispatch(register({username : dto.username, email: dto.email, password: dto.password1,isFarmer:dto.isFarmer}))
+
+    try {
+      const result = await dispatch(register({username : dto.username, email: dto.email, password: dto.password1,isFarmer:dto.isFarmer}))
+
+      if (register.fulfilled.match(result)) {
+        // Успешный логин
+        if (dto.isFarmer) {
+          navigate('/farmer/orders');
+        } else {
+          navigate('/');
+        }
+      } else {
+        console.error('Ошибка входа:', result.payload);
+      }
+    } catch (error) {
+      console.error('Ошибка логина:', error);
+    }
+
      
   };
 

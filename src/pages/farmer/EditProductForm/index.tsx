@@ -1,15 +1,15 @@
-// AddProductForm.jsx
+// EditProductForm.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import { addProduct, resetStatus } from '../farmerSlise';
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
-import styles from './addProductsForm.module.scss';
+import styles from '../addProductsForm/addProductsForm.module.scss';
 import FarmerNavHeader from '../../../components/FarmerNavHeader';
 import { checkFarmer } from '../../../features/authForm/authSlice';
 import { RootState } from '../../../redux/store';
 import SuccessPopup from '../../../components/SuccessPopup';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { updateProduct, resetEditStatus } from '../farmerSlise';
 
 const CATEGORIES = [
   { id: 1, name: 'Овощи' },
@@ -20,10 +20,18 @@ const CATEGORIES = [
   // добавь варианты по своему
 ]
 
-const AddProductForm = () => {
+
+const EditProductForm = () => {
   const dispatch = useAppDispatch();
   const formRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
+
+  const { id } = useParams();
+
+  if (!id) {
+    console.error('Нет id товара');
+    return <div>Нет такого товара</div>;
+  }
 
   const token = Cookies.get('farmerToken');
   if (!token) throw new Error('Пользователь не авторизован');
@@ -40,32 +48,24 @@ const AddProductForm = () => {
   });
 
   const [popupShown, setPopupShown] = useState(false);
-  const status = useAppSelector((state: RootState) => state.farmerSlise.status);
+  const editStatus = useAppSelector((state: RootState) => state.farmerSlise.editStatus);
 
   useEffect(() => {
     if (token) {
       dispatch(checkFarmer()); 
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
-    if (status === 'succeeded' && !popupShown) {
+    if (editStatus === 'succeeded') {
       setPopupShown(true);
-    }
-  }, [status, popupShown]);
-
-  useEffect(() => {
-    if (status === 'succeeded') {
-      if (formRef.current) {
-        formRef.current.reset();
-      }
-
       setTimeout(() => {
-        dispatch(resetStatus()); 
+        setPopupShown(false);
+        dispatch(resetEditStatus()); 
         navigate('/farmer/products'); 
       }, 2000);
     }
-  }, [status, dispatch, navigate]);
+  }, [editStatus, dispatch, navigate]);
 
   const handleChange = (e:any) => {
     const { name, value } = e.target;
@@ -79,31 +79,35 @@ const AddProductForm = () => {
     if (e.target.files?.[0]) {
       setForm((prev) => ({
         ...prev,
-        img: e.target.files[0],
+        img: e.target.files[0]
       }));
     }
   };
 
   const handleClosePopup = () => {
     setPopupShown(false);
-    dispatch(resetStatus()); 
+    dispatch(resetEditStatus()); 
   };
 
   const handleSubmit = (e:any) => {
     e.preventDefault();
 
-    if (!form.img || !sellerId) return;
+    if (!sellerId) return;
 
     const formData = new FormData();
+
     formData.append('name', form.name);
     formData.append('description', form.description);
     formData.append('price', form.price);
     formData.append('categoryId', form.categoryId);
     formData.append('sellerId', sellerId.toString()); 
     formData.append('measure', form.measure);
-    formData.append('img', form.img);
 
-    dispatch(addProduct(formData));
+    if (form.img) {
+      formData.append('img', form.img);
+    }
+
+    dispatch(updateProduct({ id: Number(id), formData }));
 
   };
 
@@ -111,7 +115,7 @@ const AddProductForm = () => {
     <>
       {popupShown && (
         <SuccessPopup
-          message="Товар успешно добавлен!"
+          message="Товар успешно изменен!"
           onClose={handleClosePopup}
         />
       )}
@@ -121,7 +125,7 @@ const AddProductForm = () => {
       <div className={styles.container}>
         <form onSubmit={handleSubmit} ref={formRef} className={styles.form}>
           <h2 className={styles.title}>
-            Добавить новый товар
+            Редактировать товар
           </h2>
 
           <input
@@ -182,17 +186,16 @@ const AddProductForm = () => {
             accept="image/*"
             onChange={handleFileChange}
             className={styles.fileInput}
-            required
           />
 
           <button type="submit" className={styles.button}>
-            Добавить товар
+            Обновить товар
           </button>
         </form>
       </div>
     </>
   );
-}
+};
 
-export default AddProductForm;
+export default EditProductForm;
 

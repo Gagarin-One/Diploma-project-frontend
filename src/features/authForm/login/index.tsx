@@ -30,7 +30,7 @@ const LoginForm = () => {
       if (login.fulfilled.match(result)) {
         // Успешный логин
         if (dto.isFarmer) {
-          navigate('/farmer');
+          navigate('/farmer/orders');
         } else {
           navigate('/');
         }

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Product } from '../../pages/home/homeSlice';
 import s from './productCard.module.scss';
 
@@ -6,8 +6,18 @@ import s from './productCard.module.scss';
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const navigate = useNavigate();
-  const handleCardClick = () => {
-    navigate(`/product/${product.id}`);
+  const location = useLocation();
+
+  const handleCardClick = ( e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation();
+
+    if (location.pathname === '/farmer/products') {
+      // На странице списка товаров - навигируем на редактирование
+      navigate(`/farmer/products/edit/${product.id}`);
+    } else {
+  
+      navigate(`/product/${product.id}`);
+    }
   };
 
   return (

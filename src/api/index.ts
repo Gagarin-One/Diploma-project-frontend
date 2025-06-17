@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { CreateUserDto, loginDto, ResponceUser, ResponceProduct, basketDto, BasketResponce, BasketItem } from '../types/types';
 import { Order } from '../pages/farmer/farmerSlise';
 import { Product } from '../pages/home/homeSlice';
@@ -8,6 +8,17 @@ const instance = axios.create({
   baseURL: 'http://localhost:5001/api/',
 });
 
+export interface ProductResponse {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  categoryId: number;
+  sellerId?: number; // sellerId не обновляем, но он может быть в ответе
+  img_url: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 export const userApi = {
   async register(dto: CreateUserDto): Promise<ResponceUser> {
     const { data } = await instance.post<CreateUserDto, { data: ResponceUser }>(
@@ -99,6 +110,25 @@ export const farmerApi = {
 
     return data;
   },
+  updateProduct: async (
+    id: number,
+    formData: FormData
+  ): Promise<ProductResponse> => {
+
+    const response: AxiosResponse<ProductResponse> = await instance.put(
+      `/product/${id}`,
+      formData
+    );
+
+    return response.data;
+  },
+  async getNotifications(farmerId:number) {
+    const { data } = await instance.get(`order/notifications/${farmerId}`);
+    return data;
+  },
+  async clearNotifications(farmerId:number) {
+    await instance.delete(`order/notifications/${farmerId}`);
+  },
 };
 
 
@@ -150,4 +180,17 @@ export const orderApi = {
   },
 
 
+}
+
+export const reviewApi = {
+  async create(payload:any) {
+    // payload = {userId, sellerId, review, rating}
+    const { data } = await instance.post('/review/create', payload);
+    return data;
+  },
+  
+  async getAll(sellerId:number) {
+    const { data } = await instance.get('/review/' + sellerId);
+    return data;
+  },
 }

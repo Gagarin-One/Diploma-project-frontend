@@ -32,6 +32,8 @@ interface FarmerOrdersState {
   loading: boolean;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+  editStatus: string; 
+  notifications: Array<string>,
 }
 
 const initialState: FarmerOrdersState = {
@@ -39,6 +41,8 @@ const initialState: FarmerOrdersState = {
   loading: false,
   status: 'idle',
   error: null,
+  editStatus: '',
+  notifications: [],
 };
 
 export const addProduct = createAsyncThunk(
@@ -72,14 +76,55 @@ export const fetchFarmerOrders = createAsyncThunk<Order[], void, { rejectValue: 
     }
   }
 );
+export const updateProduct = createAsyncThunk(
+  'farmer/updateProduct',
+  async (
+    { id, formData }: { id: number; formData: FormData },
+  ) => {
+    const response = await farmerApi.updateProduct(id, formData);
+    return response;
+  },
+);
 
+export const fetchFarmerNotifications = createAsyncThunk(
+  'farmer/fetchFarmerNotifications',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = Cookies.get('farmerToken');
+      if (!token) {
+        return rejectWithValue('Вы не авторизованы');
+      }
 
+      const decoded = jwtDecode<{ id: number }>(token);
+      const farmerId = decoded.id;
+
+      const response = await farmerApi.getNotifications(farmerId);
+      return response;
+    } catch (error:any) {
+      return rejectWithValue(error.response?.data?.message ||
+        'Не удалось взять уведомления');
+    }
+  }
+);
+export const clearFarmerNotifications = createAsyncThunk<void, number>(
+  'farmer/clearNotifications',
+  async (farmerId, { rejectWithValue }) => {
+    try {
+      await farmerApi.clearNotifications(farmerId);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Не удалось очистить уведомления');
+    }
+  }
+);
 const farmerOrdersSlice = createSlice({
   name: 'farmerOrders',
   initialState,
   reducers: {
     resetStatus(state) {
       state.status = 'idle';
+    },
+    resetEditStatus(state) {
+      state.editStatus = '';
     },
   },
   extraReducers: (builder) => {
@@ -106,8 +151,38 @@ const farmerOrdersSlice = createSlice({
       .addCase(addProduct.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
+      })
+      .addCase(updateProduct.pending, (state) => {
+        state.editStatus = 'loading';
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.editStatus = 'succeeded';
+
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.editStatus = 'failed';
+        state.error = action.error.message ?? 'Не удалось изменить';
+      })
+      .addCase(fetchFarmerNotifications.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchFarmerNotifications.fulfilled, (state, action) => {
+        state.loading = false;
+        state.notifications = action.payload;
+      })
+      .addCase(fetchFarmerNotifications.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(clearFarmerNotifications.fulfilled, (state) => {
+        state.notifications = []; // очищаем уведомления в состоянии
+      })
+      .addCase(clearFarmerNotifications.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
+      
+      ;
   },
 });
-export const { resetStatus } = farmerOrdersSlice.actions;
+export const { resetStatus, resetEditStatus } = farmerOrdersSlice.actions;
 export default farmerOrdersSlice.reducer;

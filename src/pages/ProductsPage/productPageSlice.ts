@@ -13,6 +13,8 @@ interface Product{
   img:string|null;
   sellerName:string|null;
   category:string|null;
+  measure:string;
+  sellerId:number
 }
 interface ProductState {
   productInfo:Product
@@ -30,6 +32,8 @@ const initialState: ProductState = {
     img:null,
     sellerName:null,
     category:null, 
+    measure:'',
+    sellerId:0
   },
     loading: false,
     error: null,

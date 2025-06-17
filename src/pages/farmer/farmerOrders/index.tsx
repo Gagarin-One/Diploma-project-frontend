@@ -8,11 +8,12 @@ import FarmerNavHeader from '../../../components/FarmerNavHeader';
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import Cookies from 'js-cookie';
 import { changeOrderStatus } from '../../../features/order/orderSlice';
+import { useNavigate } from 'react-router-dom';
 
 const FarmerOrders = () => {
   const dispatch = useAppDispatch();
   const { orders, loading, error } = useAppSelector((state) => state.farmerSlise);
-
+const navigate = useNavigate()
   useEffect(() => {
     const token = Cookies.get('farmerToken');
     if (token) {
@@ -20,8 +21,15 @@ const FarmerOrders = () => {
       dispatch(fetchFarmerOrders());
     } else {
       console.warn('Нет токена фермера');
+      navigate('/login');
     }
   }, []);
+  const statusNames = {
+    pending: 'В ожидании',
+    'in processing': 'В обработке',
+    completed: 'Выполнен',
+    dismissed: 'Отменен',
+  } as Record<string, string>;
 
   return (
     <div className={s.ordersContainer}>
@@ -37,7 +45,7 @@ const FarmerOrders = () => {
           orders.map((order) => (
             <div key={order.id} className={s.orderCard}>
               <h3>Заказ #{order.id}</h3>
-              <p>Статус: {order.status}</p>
+              <p>Статус: {statusNames[order.status] ?? order.status}</p>
               <p>Сумма: {order.total_price} ₽</p>
               <p>Адрес: {order.address} ₽</p>
             <p className={s.date}>Дата доставки: {new Date(order.delivery_date).toLocaleString()}</p>

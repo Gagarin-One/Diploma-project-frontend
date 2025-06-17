@@ -4,7 +4,7 @@
   border-radius: 5px;
   display: flex;
   flex-wrap: wrap;
-  
+  min-height:500px
 }
 
 .title {
@@ -94,4 +94,15 @@
   border: 1px solid #4a4a4a;
   background-color: #f8f8f8;
   color: #333;
+}
+@media (max-width: 1200px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .searchContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }

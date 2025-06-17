@@ -11,14 +11,14 @@ const ProductPage: React.FC = () => {
   const productInfo = useAppSelector((state) => state.productSlice.productInfo);
   const isAuthenticated = useAppSelector((state) => state.authSlice.isAuthenticated);
   const isAddToBasket = useAppSelector((state) => state.productSlice.isAddToBasket);
-  const basketInfo = useAppSelector((state) => state.basketSlice.basketInfo )
+  const basketInfo = useAppSelector((state) => state.basketSlice.basketInfo);
   const params = useParams();
   const [attentionPopup, setAttentionPopup] = useState(false);
 
   const { id } = useParams();
-  const numericId = Number(id)
+  const numericId = Number(id);
 
-  const hasProduct = basketInfo.some(item => item.productId === numericId);
+  const hasProduct = basketInfo.some((item) => item.productId === numericId);
 
   useEffect(() => {
     dispatch(getProductById(Number(params.id)));
@@ -42,18 +42,23 @@ const ProductPage: React.FC = () => {
       <div className={s.sideBar}>
         <h3>{productInfo.category}</h3>
         <h2>{productInfo.productName}</h2>
-        <h4>Продавец: {productInfo.sellerName}</h4>
+        <h2> <Link to={`/review/${productInfo.sellerId}`} className={s.reviewBtn}>
+            Отзывы на продавца
+          </Link></h2>
+        <h4>
+          Продавец: {productInfo.sellerName}{' '}
+         
+        </h4>
+
+        <h4>Цена указана за:{productInfo.measure}</h4>
         <b>{productInfo.price} ₽</b>
         <h3 className={s.description}>{productInfo.description}</h3>
         {!hasProduct ? (
           <button onClick={() => addToBasketClick()}>Добавить в корзину</button>
         ) : (
-  
-            <button onClick={() => addToBasketClick()}>Добавлено в корзину!</button>
-  
+          <button onClick={() => addToBasketClick()}>Добавлено в корзину!</button>
         )}
 
-        <Link to="/login">Узнать условия доставки</Link>
       </div>
     </div>
   );

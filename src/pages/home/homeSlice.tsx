@@ -15,6 +15,7 @@ interface UserState {
   products: Array<Product> | null;
   currentPage: number;
   totalProductsAmount: number;
+  userName:string
 }
 export type Product = {
   id: number;
@@ -25,6 +26,7 @@ export type Product = {
   sellerName: string;
   sellerId: number;
   categoryId: number;
+  measure:string
 };
 
 const initialState: UserState = {
@@ -34,6 +36,7 @@ const initialState: UserState = {
   products: null,
   currentPage: 1,
   totalProductsAmount: 1,
+  userName:'',
 };
 
 interface FetchAllProductsParams {
@@ -73,9 +76,9 @@ const userSlice = createSlice({
     setCurrentPage: (state, action: PayloadAction<number>) => {
       state.currentPage = action.payload;
     },
-    //   decrement: (state) => {
-    //     state.value -= 1;
-    //   },
+      setUserName: (state, action: PayloadAction<string>) => {
+        state.userName =  action.payload;
+      },
     //   reset: (state) => {
     //     state.value = 0;
     // }
@@ -98,6 +101,6 @@ const userSlice = createSlice({
   },
 });
 export const selectProducts = (state: UserState) => state.products;
-export const { setCurrentPage } = userSlice.actions;
+export const { setCurrentPage, setUserName} = userSlice.actions;
 
 export default userSlice.reducer;
