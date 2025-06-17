@@ -15,7 +15,7 @@ height: 35px;
   a{
     color: #ffffff;
     margin: 5px 15px 0 0px;  
-    width: 50px;
+    width: 100px;
     text-align: center;
     font-weight: 500;
   }
@@ -29,6 +29,11 @@ height: 35px;
     @media (min-width: 1200px) {
       width: 1150px;
   }
+}
+.emptyWrapper{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
   
 }

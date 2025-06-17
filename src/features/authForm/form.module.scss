@@ -62,3 +62,15 @@
 .hideError{
   visibility: hidden;
 }
+.radioGroup {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}

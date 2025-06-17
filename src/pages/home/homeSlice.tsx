@@ -40,34 +40,31 @@ interface FetchAllProductsParams {
   page?: number;
   categoryId?: number;
   searchString?: string;
+  priceSort?: 'asc' | 'desc';
 }
 
 export const fetchAllProducts = createAsyncThunk(
   'user/fetchAllProducts',
-  async ({ page, categoryId, searchString }: FetchAllProductsParams) => {
-    const params: { limit?: number; page?: number; categoryId?: number; searchString?: string } =
-      {};
+  async ({ page, categoryId, searchString, priceSort }: FetchAllProductsParams) => {
+    const params: {
+      limit?: number;
+      page?: number;
+      categoryId?: number;
+      searchString?: string;
+      priceSort?: string;
+    } = {};
 
     params.limit = 16;
+    if (page !== undefined) params.page = page;
+    if (categoryId !== undefined) params.categoryId = categoryId;
+    if (searchString !== undefined) params.searchString = searchString;
+    if (priceSort) params.priceSort = priceSort;
 
-    if (page !== undefined) {
-      params.page = page;
-    }
-
-    if (categoryId !== undefined) {
-      params.categoryId = categoryId;
-    }
-
-    if (searchString !== undefined) {
-      params.searchString = searchString;
-    }
-    const response = await axios.get('http://localhost:5001/api/product', {
-      params: params,
-    });
-
+    const response = await axios.get('http://localhost:5001/api/product', { params });
     return response.data;
-  },
+  }
 );
+
 
 const userSlice = createSlice({
   name: 'user',

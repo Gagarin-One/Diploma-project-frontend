@@ -1,6 +1,7 @@
 export type loginDto = {
   email: string;
   password: string;
+  isFarmer: boolean; 
 };
 
 export type CreateUserDto = {

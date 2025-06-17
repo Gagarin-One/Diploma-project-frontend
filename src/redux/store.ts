@@ -5,6 +5,9 @@ import userSlice from '../pages/home/homeSlice';
 import authSlice from '../features/authForm/authSlice';
 import productSlice from '../pages/ProductsPage/productPageSlice';
 import basketSlice from '../pages/basket/basketSlice';
+import farmerSlise from '../pages/farmer/farmerSlise';
+import farmerProductsSlice from '../pages/farmer/farmerProducts/farmerProductsSlice';
+import orderSlice from '../features/order/orderSlice';
 
 const rootReducers = combineReducers({
   counterSlice,
@@ -12,6 +15,9 @@ const rootReducers = combineReducers({
   authSlice,
   productSlice,
   basketSlice,
+  farmerSlise,
+  farmerProductsSlice,
+  orderSlice
 });
 
 export const store = configureStore({

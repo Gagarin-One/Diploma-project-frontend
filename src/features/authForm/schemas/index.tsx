@@ -5,12 +5,16 @@ export type registrationFormData = yup.InferType<typeof registrationFormSchema>;
 
 export const loginFormSchema = yup.object().shape({
   email: yup
-  .string()
-  .email('Неправильно указана почта').required('Поле обязательно'),
+    .string()
+    .email('Неправильно указана почта')
+    .required('Поле обязательно'),
   password: yup
     .string()
     .min(6, 'Длина пароля должна быть более 6 символов')
     .required('Поле обязательно'),
+  isFarmer: yup
+    .boolean()
+    .required('Выберите, являетесь ли вы фермером'),
 });
 
 export const registrationFormSchema = yup.object().shape({
@@ -29,4 +33,7 @@ export const registrationFormSchema = yup.object().shape({
     .required('Поле обязательно')
     .matches(/[A-Z]/, 'Пароль должен содержать хотя бы одну заглавную букву.')
     .matches(/[a-z]/, 'Пароль должен содержать хотя бы одну строчную букву.'),
+    isFarmer: yup
+    .boolean()
+    .required('Выберите, являетесь ли вы фермером'),
 });

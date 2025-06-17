@@ -24,7 +24,7 @@ const initialState: basketState = {
 
 export const getBasket = createAsyncThunk('basket', async () => {
   try {
-    const token = Cookies.get('authToken'); 
+    const token = Cookies.get('userToken'); 
       if (!token) throw new Error('Пользователь не авторизован');
 
       const decoded = jwtDecode<JwtPayload>(token);
@@ -44,7 +44,7 @@ export const updateBasketQuantity = createAsyncThunk(
   'basket/updateQuantity',
   async ({ productId, quantity }: UpdatePayload, { rejectWithValue }) => {
     try {
-      const token = Cookies.get('authToken');
+      const token = Cookies.get('userToken');
       if (!token) throw new Error('Пользователь не авторизован');
 
       const decoded = jwtDecode<{ id: number }>(token);

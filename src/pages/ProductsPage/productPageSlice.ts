@@ -50,7 +50,7 @@ export const getProductById = createAsyncThunk('product', async (id:number) => {
 
 export const addToBasket = createAsyncThunk('basket/addProduct', async (dto: basketDto, { dispatch }) => {
   try {
-    const token = Cookies.get('authToken'); 
+    const token = Cookies.get('userToken'); 
       if (!token) throw new Error('Пользователь не авторизован');
 
       const decoded = jwtDecode<JwtPayload>(token);

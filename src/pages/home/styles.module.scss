@@ -59,11 +59,13 @@
 .linksContainer{
   margin-left: 30px;
   margin-right: auto;
-  a{
+  button{
     color:#717171;
-    font-size: 1.1rem;
+    font-size: 1.0rem;
     font-weight: 400;
-    margin: 0 6px;
+    margin: 10px 6px;
+    width: 130px;
+    text-align: center;
     &:hover{
       cursor: pointer;
       color:#c2c2c2;
@@ -82,4 +84,14 @@
 .lowerAd{
   margin:20px 0 60px 35px;
   
+}
+
+.sortSelect {
+  margin-right: 12px;
+  padding: 8px 10px;
+
+  font-size: 14px;
+  border: 1px solid #4a4a4a;
+  background-color: #f8f8f8;
+  color: #333;
 }

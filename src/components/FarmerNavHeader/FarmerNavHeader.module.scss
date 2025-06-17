@@ -1,0 +1,23 @@
+.headerWrapper {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.navButton {
+  padding: 10px 20px;
+  background-color: #e7e7e7;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: 0.2s;
+
+  &:hover {
+    background-color: #dcdcdc;
+  }
+}
+
+.active {
+  background-color: #b3e5c1;
+}

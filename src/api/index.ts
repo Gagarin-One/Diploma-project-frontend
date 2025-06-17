@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { CreateUserDto, loginDto, ResponceUser, ResponceProduct, basketDto, BasketResponce, BasketItem } from '../types/types';
+import { Order } from '../pages/farmer/farmerSlise';
+import { Product } from '../pages/home/homeSlice';
 
 
 const instance = axios.create({
@@ -35,6 +37,73 @@ export const productApi = {
 
 };
 
+export const farmerApi = {
+  async register(dto: CreateUserDto): Promise<ResponceUser> {
+    const { data } = await instance.post<CreateUserDto, { data: ResponceUser }>(
+      'seller/registration',
+      dto,
+    );
+    return data;
+  },
+  createProduct: async (formData: FormData) => {
+    const { data } = await instance.post<FormData, { data: Product }>(
+      'product/create',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
+    return data;
+  },
+  async login(dto: loginDto): Promise<ResponceUser> {
+    const { data } = await instance.post<loginDto, { data: ResponceUser }>('seller/login', dto);
+    return data;
+  },
+  async getMe(token:string) {
+    const {data} = await instance.get<ResponceUser>('seller/auth', {
+      headers: { 'Authorization': 'Bearer ' + token}
+    })
+    return data;
+  },
+  async getOrders(userId: number): Promise<{ orders: Order[] }> {
+    const { data } = await instance.get<{ orders: Order[] }>(`order/seller/findAll/${userId}`);
+    return data;
+  },
+  async getProductsByFarmer({
+    page = 1,
+    limit = 9,
+    sellerId,
+    categoryId,
+    searchString,
+  }: {
+    page?: number;
+    limit?: number;
+    sellerId?: number;  
+    categoryId?: number;
+    searchString?: string;
+  }) {
+    const params: {
+      page: number;
+      limit: number;
+      sellerId?: number;
+      categoryId?: number;
+      searchString?: string;
+    } = { page, limit, sellerId };
+
+    if (categoryId) params.categoryId = categoryId;
+    if (searchString) params.searchString = searchString;
+
+    const { data } = await instance.get<{ count: number; rows: Product[] }>('product', {
+      params,
+    });
+
+    return data;
+  },
+};
+
+
+
+
 export const basketApi = {
   async add(dto:basketDto): Promise<BasketResponce> {
     const { data } = await instance.post<basketDto, { data: BasketResponce }>('basket/addProduct', dto);
@@ -51,26 +120,34 @@ export const basketApi = {
 };
 
 export const orderApi = {
-  async create(userId: number): Promise<{ orders: any[] }> {
-    const { data } = await instance.post<{ userId: number }, { data: { orders: any[] } }>(
-      'order/create',
-      { userId }
-    );
+  async create({
+    userId,
+    address,
+    delivery_date,
+  }: {
+    userId: number;
+    address: string;
+    delivery_date: string;
+  }): Promise<{ orders: any[] }> {
+    const { data } = await instance.post<{ orders: any[] }>('order/create', {
+      userId,
+      address,
+      delivery_date,
+    });
+    return data;
+  },
+  
+  async changeStatus(orderId: number, status: string) {
+    const { data } = await instance.put('/order/changeStatus', {
+      orderId,
+      status,
+    });
+    return data;
+  },
+  async getUserOrders(userId: number) {
+    const { data } = await instance.get(`/order/user/findAll/${userId}`);
     return data;
   },
 
-  // async findForUser(userId: number): Promise<any[]> {
-  //   const { data } = await instance.get<any[]>(`order/user/${userId}`);
-  //   return data;
-  // },
 
-  // async findForSeller(sellerId: number): Promise<any[]> {
-  //   const { data } = await instance.get<any[]>(`order/seller/${sellerId}`);
-  //   return data;
-  // },
-
-  // async changeStatus(payload: { status: 'pending' | 'ready_for_pickup'; orderId: number }): Promise<string> {
-  //   const { data } = await instance.put<typeof payload, { data: string }>('order/status', payload);
-  //   return data;
-  // },
 }

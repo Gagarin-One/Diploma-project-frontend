@@ -1,113 +1,134 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
-import { userApi } from '../../api';
+import { farmerApi, userApi } from '../../api';
 import { CreateUserDto, loginDto } from '../../types/types';
 
 interface AuthState {
-    token: string | null;
-    error: string | null;
-    loading: boolean;
-    isAuthenticated: boolean;
+  token: string | null;
+  error: string | null;
+  loading: boolean;
+  isAuthenticated: boolean;
+  isFarmer: boolean;
 }
 
 const initialState: AuthState = {
-    token: null,
-    error: '',
-    loading: false,
-    isAuthenticated: false
+  token: null,
+  loading: false,
+  error: null,
+  isAuthenticated: false,
+  isFarmer: false,
 };
 
-export const loginUser = createAsyncThunk('user/login', async (dto: loginDto) => {
-  try {
-    const response = await userApi.login(dto);
-    return response.token;
-  } catch (error:any) {
-    // Если ошибка имеет ответ от сервера
-    if (error.response && error.response.data) {
-      throw new Error(error.response.data.message); 
-    }
-    throw new Error('Что-то пошло не так'); 
-  }
-});
+const getApi = (isFarmer?: boolean) => (isFarmer ? farmerApi : userApi);
 
-export const registerUser = createAsyncThunk('user/register', async (dto: CreateUserDto) => {
-  try {
-    const response = await userApi.register(dto);
-    return response.token;
-  } catch (error:any) {
-    // Если ошибка имеет ответ от сервера
-    if (error.response && error.response.data) {
-      throw new Error(error.response.data.message); 
-    }
-    throw new Error('Что-то пошло не так');
-  }
-});
+// ========== THUNKS ==========
 
-export const checkUser = createAsyncThunk('user/fetchUserProfile', async () => {
-  const token = Cookies.get('authToken')
-  if (token){
+export const login = createAsyncThunk(
+  'auth/login',
+  async (dto: loginDto) => {
+    const api = getApi(dto.isFarmer);
+    const response = await api.login(dto);
+    return { token: response.token, isFarmer: dto.isFarmer };
+  }
+);
+
+export const register = createAsyncThunk(
+  'auth/register',
+  async (dto: CreateUserDto) => {
+    const api = getApi(dto.isFarmer);
+    const response = await api.register(dto);
+    return { token: response.token, isFarmer: dto.isFarmer };
+  }
+);
+
+export const checkUser = createAsyncThunk(
+  'auth/checkUser',
+  async () => {
+    const token = Cookies.get('userToken');
+    if (!token) throw new Error('Вы не зашли как пользователь');
+
     const response = await userApi.getMe(token);
-    console.log(111)
-    return response.token;
-  }else {
-    console.log(222)
-    throw new Error('Вы не зашли в аккаунт'); 
+    return { token: response.token, isFarmer: false };
   }
-});
+);
+
+export const checkFarmer = createAsyncThunk(
+  'auth/checkFarmer',
+  async () => {
+    const token = Cookies.get('farmerToken');
+    if (!token) throw new Error('Вы не зашли как фермер');
+
+    const response = await farmerApi.getMe(token);
+    return { token: response.token, isFarmer: true };
+  }
+);
+
+// ========== SLICE ==========
 
 const authSlice = createSlice({
-    name: 'auth',
-    initialState,
-    reducers: {
-        logout(state) {
-            state.token = null;
-            Cookies.remove('authToken'); 
-        },
+  name: 'auth',
+  initialState,
+  reducers: {
+    logout(state) {
+      state.token = null;
+      state.isAuthenticated = false;
+      state.isFarmer = false;
+      Cookies.remove('userToken');
+      Cookies.remove('farmerToken');
     },
-    extraReducers: (builder) => {
-        builder.addCase(loginUser.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(loginUser.fulfilled, (state, action) => {
-          state.loading = false;
-          state.token = action.payload;
-          Cookies.set('authToken', action.payload, { expires: 7 }); 
-          state.isAuthenticated = true;
-        })
-        .addCase(loginUser.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.error.message|| 'Что-то пошло не так';
-        })
-        .addCase(registerUser.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(registerUser.fulfilled, (state, action) => {
-          state.loading = false;
-          state.token = action.payload;
-          Cookies.set('authToken', action.payload, { expires: 7 }); 
-          state.isAuthenticated = true;
-        })
-        .addCase(registerUser.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.error.message|| 'Что-то пошло не так';
-        })
-        .addCase(checkUser.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(checkUser.fulfilled, (state, action) => {
-          state.loading = false;
-          state.token = action.payload;
-          Cookies.set('authToken', action.payload, { expires: 7 }); 
-          state.isAuthenticated = true;
-        })
-        .addCase(checkUser.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.error.message || 'Что-то пошло не так';
-        })
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // LOGIN
+      .addCase(login.fulfilled, (state, action) => {
+        const { token, isFarmer } = action.payload;
+        state.token = token;
+        state.isAuthenticated = true;
+        state.isFarmer = isFarmer;
+        Cookies.set(isFarmer ? 'farmerToken' : 'userToken', token, { expires: 7 });
+      })
+
+      // REGISTER
+      .addCase(register.fulfilled, (state, action) => {
+        const { token, isFarmer } = action.payload;
+        state.token = token;
+        state.isAuthenticated = true;
+        state.isFarmer = isFarmer;
+        Cookies.set(isFarmer ? 'farmerToken' : 'userToken', token, { expires: 7 });
+      })
+
+      // CHECK USER
+      .addCase(checkUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(checkUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.isFarmer = false;
+      })
+      .addCase(checkUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Ошибка проверки пользователя';
+      })
+
+      // CHECK FARMER
+      .addCase(checkFarmer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(checkFarmer.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.isFarmer = true;
+      })
+      .addCase(checkFarmer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Ошибка проверки фермера';
+      });
+  },
 });
 
 export const { logout } = authSlice.actions;

@@ -3,9 +3,10 @@ import { registrationFormSchema, registrationFormData } from '../schemas';
 import s from '../form.module.scss';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
-import { registerUser } from '../authSlice';
+
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { register } from '../authSlice';
 
 const RegistrationForm = () => {
   const dispatch = useAppDispatch();
@@ -15,7 +16,7 @@ const RegistrationForm = () => {
   const navigate = useNavigate();
 
   const {
-    register,
+    register: formRegister,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<registrationFormData>({
@@ -28,7 +29,7 @@ const RegistrationForm = () => {
   }, [isAuthenticated])
 
   const onSubmit = async (dto: registrationFormData) => {
-  dispatch(registerUser({username : dto.username, email: dto.email, password: dto.password1}))
+  dispatch(register({username : dto.username, email: dto.email, password: dto.password1,isFarmer:dto.isFarmer}))
      
   };
 
@@ -36,18 +37,23 @@ const RegistrationForm = () => {
     <div className={s.formWrapper}>
       <form className={s.form} onSubmit={handleSubmit(onSubmit)}>
         <p>ИМЯ И ФАМИЛИЯ</p>
-        <input className={s.input} {...register('username')} />
+        <input className={s.input} {...formRegister('username')} />
         <b className={s.error}>{errors.username?.message}</b>
         <p>ЭЛ.ПОЧТА</p>
-        <input className={s.input} {...register('email')} />
+        <input className={s.input} {...formRegister('email')} />
         <b className={s.error}>{errors.email?.message}</b>
         <p>ПАРОЛЬ</p>
-        <input className={s.input} {...register('password1')} />
+        <input className={s.input} {...formRegister('password1')} />
         <b className={s.error}>{errors.password1?.message}</b>
         <p>ПОВТОРИТЕ ПАРОЛЬ</p>
-        <input className={s.input} {...register('password2')} />
+        <input className={s.input} {...formRegister('password2')} />
         <b className={s.error}>{errors.password2?.message}</b>
         <b className={s.error}>{formErr}</b>
+        <div className={s.radioGroup}>
+          <label className={s.radioLabel}>
+            <input type="checkbox" {...formRegister('isFarmer')} />Я фермер
+          </label>
+        </div>
         <input
           className={s.submitBtn}
           type="submit"
